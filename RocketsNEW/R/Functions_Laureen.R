@@ -6,7 +6,7 @@
 #' @return Returns a concise data frame with all  rocket launches in 2024 and additional information about launches.
 #' @examples
 #' # data_rockets <- getRocketData()
-#' @note Packages needed: httr, jsonlite, dplyr; If warning is issued regarding GET function, run getRocketData() again until the data is returned.
+#' @note If Error occurs: "Error in curl::curl_fetch_memory(url, handle = handle) : etc", run getRocketData() again until the data is returned.
 #' @export
 getRocketData <- function(){
   
@@ -28,8 +28,8 @@ getRocketData <- function(){
   data_pns <- dplyr::bind_rows(data_launch, data_launch_fail)
   
   ##making data frame with only useful columns and better names
-  data_rockets <- as.data.frame(cbind(data_pns$name, data_pns$status$id, data_pns$status$abbrev, data_pns$window_end, data_pns$failreason, data_pns$launch_service_provider$name, data_pns$launch_service_provider$type, data_pns$mission$description, data_pns$mission$type, data_pns$pad$latitude, data_pns$pad$longitude))
-  names <- c("name","success_id","success_abbrev","time_of_launch","failreason","provider_name","provider_category","mission_description", "mission_purpose","latitude","longitude" )
+  data_rockets <- as.data.frame(cbind(data_pns$name, data_pns$status$id, data_pns$status$abbrev, data_pns$window_end, data_pns$failreason, data_pns$launch_service_provider$name, data_pns$launch_service_provider$type, data_pns$mission$description, data_pns$mission$type, data_pns$pad$latitude, data_pns$pad$longitude, data_pns$image))
+  names <- c("name","success_id","success_abbrev","time_of_launch","failreason","provider_name","provider_category","mission_description", "mission_purpose","latitude","longitude","image_URL")
   colnames(data_rockets) <- names
   data_rockets$latitude <- as.numeric(data_rockets$latitude)
   data_rockets$longitude <- as.numeric(data_rockets$longitude)
@@ -37,7 +37,4 @@ getRocketData <- function(){
   
   return(data_rockets)
 }
-
-data_rockets <- getRocketData()
-
 
