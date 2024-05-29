@@ -10,10 +10,13 @@ getRocketData <- function(){
   
   ##get success data
   res_success <- httr::GET("https://lldev.thespacedevs.com/2.2.0/launch/previous/?limit=100&status=3&window_start__gte=2024-01-01T00%3A01%3A00Z")
-  
-  rawToChar(res_success$content)
   data <- jsonlite::fromJSON(rawToChar(res_success$content))
   data_launch <- data$results
+  
+  ##get success data after 26/05/24
+  res_success_later <- httr::GET("https://lldev.thespacedevs.com/2.2.0/launch/previous/?limit=100&status=3&window_start__gte=2024-05-26T00%3A01%3A00Z")
+  data_later <- jsonlite::fromJSON(rawToChar(res_success_later$content))
+  data_launch_later <- data_later$results
   
   ##get failure data
   res_failure <- httr::GET("https://lldev.thespacedevs.com/2.2.0/launch/previous/?limit=100&status=4&window_start__gte=2024-01-01T00%3A01%3A00Z")
@@ -23,7 +26,7 @@ getRocketData <- function(){
   data_launch_fail <- data_fail$results
   
   ##combining fail and success
-  data_pns <- dplyr::bind_rows(data_launch, data_launch_fail)
+  data_pns <- dplyr::bind_rows(data_launch, data_launch_later, data_launch_fail)
   
   ##making data frame with only useful columns and better names
   data_rockets <- as.data.frame(cbind(data_pns$name, data_pns$status$id, data_pns$status$abbrev, data_pns$window_end, data_pns$failreason, data_pns$launch_service_provider$name, data_pns$launch_service_provider$type, data_pns$mission$description, data_pns$mission$type, data_pns$pad$latitude, data_pns$pad$longitude, data_pns$image))
@@ -43,13 +46,14 @@ getRocketData <- function(){
 #' @return Returns a GUI of a Shiny App that displays rocket launches on a world map. These can be filtered according to success, provider & time frame.
 #' @examples
 #' # get_GUI()
-#' @note If Error occurs: "Error in curl::curl_fetch_memory(url, handle = handle) : etc", run get_GUI() again until the data is returned.
+#' @note If Error occurs: "Error in curl::curl_fetch_memory(url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
 #' @export
 get_GUI <- function(){
   
   tempdir(check = TRUE)
   library(dplyr)
   library(bslib)
+  library(shiny)
   
   data_rockets <- getRocketData()
   
@@ -61,7 +65,7 @@ get_GUI <- function(){
       primary = "#2C3E50"
     ),
     
-    tags$style(HTML("
+    shiny::tags$style(shiny::HTML("
     #map {
       height: calc(100vh - 80px) !important;
     }
@@ -71,9 +75,9 @@ get_GUI <- function(){
     }
   ")),
     
-    shiny::titlePanel(title = tags$h1(
-      tags$b("Rocket Launches 2024"),
-      tags$style(HTML("h1 { text-align: center; }")))),
+    shiny::titlePanel(title = shiny::tags$h1(
+      shiny::tags$b("Rocket Launches 2024"),
+      shiny::tags$style(HTML("h1 { text-align: center; }")))),
     
     shiny::sidebarLayout(
       
