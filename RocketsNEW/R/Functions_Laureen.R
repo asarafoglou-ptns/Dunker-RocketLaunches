@@ -167,7 +167,7 @@ get_GUI <- function(){
         dplyr::count(provider_category) %>%
         dplyr::mutate(percentage = n / sum(n) * 100)
       
-      ggplot2::ggplot(data = df, aes(x = "", y = percentage, fill = provider_category)) +
+      ggplot2::ggplot(data = df, ggplot2::aes(x = "", y = percentage, fill = provider_category)) +
         ggplot2::geom_bar(stat = "identity", width = 1) +
         ggplot2::coord_polar("y") +
         ggplot2::labs(title = "Percentage of Launch Provider Categories",
@@ -185,7 +185,7 @@ get_GUI <- function(){
         dplyr::count(mission_purpose) %>%
         dplyr::mutate(percentage = n / sum(n) * 100)
       
-      ggplot2::ggplot(data = df, aes(x = "", y = percentage, fill = mission_purpose)) +
+      ggplot2::ggplot(data = df, ggplot2::aes(x = "", y = percentage, fill = mission_purpose)) +
         ggplot2::geom_bar(stat = "identity", width = 1) +
         ggplot2::coord_polar("y") +
         ggplot2::labs(title = "Ratio of Mission Purposes",
@@ -199,7 +199,7 @@ get_GUI <- function(){
     ##simple bar chart to display amount of launches per month
     output$Plot3 <- shiny::renderPlot({
       
-      ggplot2::ggplot(data = data_rockets, aes(x = month)) +
+      ggplot2::ggplot(data = data_rockets, ggplot2::aes(x = month)) +
         ggplot2::geom_bar(fill = "salmon")+
         ggplot2::labs(title = "Amount of Rocket Launches per Month",
                       x = "Month of Rocket Launch")+
@@ -209,7 +209,7 @@ get_GUI <- function(){
     ##stacked bar chart for Ratio of Providers
     output$Plot4 <- shiny::renderPlot({
       
-      ggplot2::ggplot(data = data_rockets, aes(x = "", fill = provider_name)) +
+      ggplot2::ggplot(data = data_rockets, ggplot2::aes(x = "", fill = provider_name)) +
         ggplot2::geom_bar(color = "white")+
         ggplot2::labs(title = "Percentage of Rocket Launches per Provider",
                       x = "",
