@@ -16,7 +16,7 @@ Returns a GUI of a Shiny App that displays rocket launches on a world map. These
 Function to Call the Shiny App "Rocket Launches 2024".
 }
 \note{
-If Error occurs: "Error in curl::curl_fetch_memory (url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
+Error message "curl::curl_fetch_memory(url, handle = handle) : Timeout was reached: etc." might occur. Don't stop function in that case. The function will repeat itself automatically until GUI is returned.
 }
 \examples{
 # get_GUI()

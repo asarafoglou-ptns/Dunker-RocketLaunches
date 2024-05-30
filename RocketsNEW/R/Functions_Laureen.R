@@ -46,7 +46,7 @@ getRocketData <- function(){
 #' @return Returns a GUI of a Shiny App that displays rocket launches on a world map. These can be filtered according to success, provider & time frame. Furthermore, there is a statistics tab with some plots.
 #' @examples
 #' # get_GUI()
-#' @note If Error occurs: "Error in curl::curl_fetch_memory (url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
+#' @note Error message "curl::curl_fetch_memory(url, handle = handle) : Timeout was reached: etc." might occur. Don't stop function in that case. The function will repeat itself automatically until GUI is returned.
 #' @export
 get_GUI <- function(){
   
@@ -55,7 +55,13 @@ get_GUI <- function(){
   library(bslib)
   library(shiny)
   
-  data_rockets <- getRocketData()
+  ##Loop for error message "Timeout was reached"
+  repeat {
+    data_rockets<-try(getRocketData())
+    if (!(inherits(data_rockets,"try-error"))) 
+      break
+  }
+  
   
   ##shiny app 
   ui <- shiny::fluidPage(
@@ -211,7 +217,7 @@ get_GUI <- function(){
       
       ggplot2::ggplot(data = data_rockets, ggplot2::aes(x = "", fill = provider_name)) +
         ggplot2::geom_bar(color = "white")+
-        ggplot2::labs(title = "Percentage of Rocket Launches per Provider",
+        ggplot2::labs(title = "Amount of Rocket Launches per Provider",
                       x = "",
                       fill = "Provider Name") +
         ggplot2::theme_bw()
