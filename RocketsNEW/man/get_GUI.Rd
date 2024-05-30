@@ -10,13 +10,13 @@ get_GUI()
 \item{none}{no parameters needed}
 }
 \value{
-Returns a GUI of a Shiny App that displays rocket launches on a world map. These can be filtered according to success, provider & time frame.
+Returns a GUI of a Shiny App that displays rocket launches on a world map. These can be filtered according to success, provider & time frame. Furthermore, there is a statistics tab with some plots.
 }
 \description{
 Function to Call the Shiny App "Rocket Launches 2024".
 }
 \note{
-If Error occurs: "Error in curl::curl_fetch_memory(url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
+If Error occurs: "Error in curl::curl_fetch_memory (url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
 }
 \examples{
 # get_GUI()

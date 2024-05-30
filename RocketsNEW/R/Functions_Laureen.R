@@ -43,10 +43,10 @@ getRocketData <- function(){
 #' @title get_GUI
 #' @description Function to Call the Shiny App "Rocket Launches 2024".
 #' @param none no parameters needed
-#' @return Returns a GUI of a Shiny App that displays rocket launches on a world map. These can be filtered according to success, provider & time frame.
+#' @return Returns a GUI of a Shiny App that displays rocket launches on a world map. These can be filtered according to success, provider & time frame. Furthermore, there is a statistics tab with some plots.
 #' @examples
 #' # get_GUI()
-#' @note If Error occurs: "Error in curl::curl_fetch_memory(url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
+#' @note If Error occurs: "Error in curl::curl_fetch_memory (url, handle = handle) : etc", run get_GUI() again until the GUI is returned.
 #' @export
 get_GUI <- function(){
   
@@ -79,35 +79,50 @@ get_GUI <- function(){
       shiny::tags$b("Rocket Launches 2024"),
       shiny::tags$style(HTML("h1 { text-align: center; }")))),
     
-    shiny::sidebarLayout(
+    shiny::tabsetPanel(
       
-      sidebarPanel = shiny::sidebarPanel(
-        shiny::helpText("You can filter the shown rocket launches according to the following options:"),
-        shiny::br(),
-        shiny::br(),
-        shiny::sliderInput("month", "Months of 2024", min = 1, max = 12, value = c(1,5)),
-        shiny::checkboxGroupInput("status", 
-                                  label = "Launch Status", 
-                                  choices = list("Success" = 3, 
-                                                 "Failure" = 4),
-                                  selected = c(3, 4)),
-        shiny::checkboxGroupInput("category", 
-                                  label = "Provider Category", 
-                                  choices = unique(data_rockets$provider_category),
-                                  selected = unique(data_rockets$provider_category)
-        ),
-        shiny::helpText("Click on the dots to get more information on the launched objects."),
-        
-        width = 3
+      shiny::tabPanel("Map",
+                      shiny::sidebarLayout(
+                        
+                        sidebarPanel = shiny::sidebarPanel(
+                          shiny::helpText("You can filter the shown rocket launches according to the following options:"),
+                          shiny::br(),
+                          shiny::br(),
+                          shiny::sliderInput("month", "Months of 2024", min = 1, max = 12, value = c(1,5)),
+                          shiny::checkboxGroupInput("status", 
+                                                    label = "Launch Status", 
+                                                    choices = list("Success" = 3, 
+                                                                   "Failure" = 4),
+                                                    selected = c(3, 4)),
+                          shiny::checkboxGroupInput("category", 
+                                                    label = "Provider Category", 
+                                                    choices = unique(data_rockets$provider_category),
+                                                    selected = unique(data_rockets$provider_category)
+                          ),
+                          shiny::helpText("Click on the dots to get more information on the launched objects."),
+                          
+                          width = 3
+                        ),
+                        
+                        mainPanel = shiny::mainPanel(
+                          leaflet::leafletOutput(outputId = "map"),
+                          width = 9
+                        )
+                      )
       ),
       
-      mainPanel = shiny::mainPanel(
-        leaflet::leafletOutput(outputId = "map"),
-        width = 9
+      shiny::tabPanel("Statistics",
+                      shiny::helpText("Here you can find some statistics about the rocket launches in 2024."),
+                      shiny::fluidRow( 
+                        shiny::column(6, plotOutput("Plot1")), 
+                        shiny::column(6, plotOutput("Plot2")),
+                        shiny::column(6, plotOutput("Plot3")),
+                        shiny::column(6, plotOutput("Plot4"))
+                      )
+                      
       )
     )
   )
-  
   
   
   server <- function(input, output){
@@ -142,6 +157,64 @@ get_GUI <- function(){
                                     "<img src =", image_URL, "width = '100px'>"
                                   ))
       
+    })
+    
+    # Statistics Tab 
+    ##Pie Chart for Provider Ratio
+    output$Plot1 <- shiny::renderPlot({
+      
+      df <- map_df() %>%
+        dplyr::count(provider_category) %>%
+        dplyr::mutate(percentage = n / sum(n) * 100)
+      
+      ggplot2::ggplot(data = df, aes(x = "", y = percentage, fill = provider_category)) +
+        ggplot2::geom_bar(stat = "identity", width = 1) +
+        ggplot2::coord_polar("y") +
+        ggplot2::labs(title = "Percentage of Launch Provider Categories",
+                      x = NULL,
+                      y = NULL,
+                      fill = "Categoy of Provider") +
+        ggplot2::theme_void() +
+        ggplot2::theme(legend.position = "right")
+    })
+    
+    ##Pie Chart for Ratio of Mission Purposes
+    output$Plot2 <- shiny::renderPlot({
+      
+      df <- map_df() %>%
+        dplyr::count(mission_purpose) %>%
+        dplyr::mutate(percentage = n / sum(n) * 100)
+      
+      ggplot2::ggplot(data = df, aes(x = "", y = percentage, fill = mission_purpose)) +
+        ggplot2::geom_bar(stat = "identity", width = 1) +
+        ggplot2::coord_polar("y") +
+        ggplot2::labs(title = "Ratio of Mission Purposes",
+                      x = NULL,
+                      y = NULL,
+                      fill = "Mission Purpose") +
+        ggplot2::theme_void() +
+        ggplot2::theme(legend.position = "right")
+    })
+    
+    ##simple bar chart to display amount of launches per month
+    output$Plot3 <- shiny::renderPlot({
+      
+      ggplot2::ggplot(data = data_rockets, aes(x = month)) +
+        ggplot2::geom_bar(fill = "salmon")+
+        ggplot2::labs(title = "Amount of Rocket Launches per Month",
+                      x = "Month of Rocket Launch")+
+        ggplot2::theme_bw()
+    })
+    
+    ##stacked bar chart for Ratio of Providers
+    output$Plot4 <- shiny::renderPlot({
+      
+      ggplot2::ggplot(data = data_rockets, aes(x = "", fill = provider_name)) +
+        ggplot2::geom_bar(color = "white")+
+        ggplot2::labs(title = "Percentage of Rocket Launches per Provider",
+                      x = "",
+                      fill = "Provider Name") +
+        ggplot2::theme_bw()
     })
     
   }
