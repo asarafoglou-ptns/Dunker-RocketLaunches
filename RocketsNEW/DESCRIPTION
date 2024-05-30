@@ -4,9 +4,9 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Laureen", "Dunker", , "laureen.dunker@web.de", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: The package displays all rocket launches in 2024 on a world map with additional information in a popup. Users can filter the shown launches by timeframe, whether it was successful and the provider of the launch. 
+Description: The package displays all rocket launches in 2024 on a world map with additional information in a popup. Users can filter the shown launches by timeframe, whether it was successful and the provider of the launch. Furthermore, they can look at some statistics about the launches. 
 License: CC BY 4.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-Imports: dplyr, httr, jsonlite, shiny, leaflet, bslib, curl
+Imports: dplyr, httr, jsonlite, shiny, leaflet, bslib, curl, ggplot2
